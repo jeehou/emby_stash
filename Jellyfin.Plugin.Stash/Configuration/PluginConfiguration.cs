@@ -1,5 +1,7 @@
 #if __EMBY__
+using System.ComponentModel;
 using Emby.Web.GenericEdit;
+using MediaBrowser.Model.Attributes;
 #else
 using MediaBrowser.Model.Plugins;
 #endif
@@ -46,6 +48,12 @@ namespace Stash.Configuration
         public bool UseFullPathToSearch { get; set; }
 
         public bool AddDisambiguation { get; set; }
+
+#if __EMBY__
+        [DisplayName("Enable automatic poster cropping via proxy")]
+        [Description("Mark scene posters for automatic face-aware cropping by your Stash image proxy. Requires a compatible proxy. Background images are unchanged.")]
+#endif
+        public bool EnableAutoPosterCrop { get; set; } = false;
 
         public TagStyle TagStyle { get; set; }
     }

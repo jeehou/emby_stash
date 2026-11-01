@@ -35,6 +35,13 @@
                             <span>Add Disambiguation to Performer Name</span>
                         </label>
                     </div>
+                    <div class="checkboxContainer checkboxContainer-withDescripton">
+                        <label class="emby-checkbox-label">
+                            <input id="EnableAutoPosterCrop" name="EnableAutoPosterCrop" type="checkbox" is="emby-checkbox" />
+                            <span>Enable automatic poster cropping via proxy</span>
+                        </label>
+                        <div class="fieldDescription">Requires a compatible Stash image proxy. Scene posters use automatic face-aware cropping; background images remain unchanged.</div>
+                    </div>
                     <div class="selectContainer">
                         <label class="selectLabel" for="TagStyle">Tag Style</label>
                         <select is="emby-select" id="TagStyle" name="TagStyle" class="emby-select-withcolor emby-select">
@@ -62,6 +69,7 @@
                     $('#UseFilePath').prop('checked', config.UseFilePath);
                     $('#UseFullPathToSearch').prop('checked', config.UseFullPathToSearch);
                     $('#AddDisambiguation').prop('checked', config.AddDisambiguation);
+                    $('#EnableAutoPosterCrop').prop('checked', config.EnableAutoPosterCrop === true);
                     $('#TagStyle').val(config.TagStyle).change();
 
                     Dashboard.hideLoadingMsg();
@@ -76,6 +84,7 @@
                     config.UseFilePath = $('#UseFilePath').prop('checked');
                     config.UseFullPathToSearch = $('#UseFullPathToSearch').prop('checked');
                     config.AddDisambiguation = $('#AddDisambiguation').prop('checked');
+                    config.EnableAutoPosterCrop = $('#EnableAutoPosterCrop').prop('checked');
                     config.TagStyle = $('#TagStyle').val();
 
                     ApiClient.updatePluginConfiguration(pluginConfig.pluginUniqueId, config).then(function (result) {

@@ -1,0 +1,6 @@
+.env
+secrets/
+*.local.yaml
+*.local.yml
+coverage.out
+stash-poster-proxy

@@ -111,7 +111,7 @@ namespace Stash.Providers
                     ProviderIds = { { Plugin.Instance.Name, searchResult.Id } },
                     Name = searchResult.Title,
                     PremiereDate = searchResult.Date,
-                    ImageUrl = searchResult.Paths.Screenshot,
+                    ImageUrl = PosterImageUrl.Create(searchResult.Paths.Screenshot, Plugin.Instance.Configuration.EnableAutoPosterCrop),
                 });
             }
 
@@ -206,7 +206,7 @@ namespace Stash.Providers
             result.Add(new RemoteImageInfo
             {
                 Type = ImageType.Primary,
-                Url = sceneData.Paths.Screenshot,
+                Url = PosterImageUrl.Create(sceneData.Paths.Screenshot, Plugin.Instance.Configuration.EnableAutoPosterCrop),
             });
 
             result.Add(new RemoteImageInfo

@@ -1,0 +1,26 @@
+services:
+  stash-poster-proxy:
+    build: .
+    image: emby-stash-poster-proxy:local
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PROXY_HOST_PORT:-18081}:18080"
+    environment:
+      LISTEN_ADDR: "0.0.0.0:18080"
+      STASH_UPSTREAM: "${STASH_UPSTREAM:?Set STASH_UPSTREAM}"
+      PROXY_PUBLIC_URL: "${PROXY_PUBLIC_URL:?Set PROXY_PUBLIC_URL}"
+      STASH_API_KEY_FILE: /run/secrets/stash_api_key
+      CACHE_MAX_MB: "64"
+      CACHE_TTL: 5m
+      CROP_WORKERS: "2"
+    secrets:
+      - stash_api_key
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    cpus: 2
+
+secrets:
+  stash_api_key:
+    file: ./secrets/stash_api_key

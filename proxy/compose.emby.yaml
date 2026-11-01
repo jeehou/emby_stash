@@ -1,0 +1,29 @@
+# Replacement for the existing authentication proxy, not an additional layer.
+# Stop the old proxy before choosing its port 18080. Do not run both on that port.
+services:
+  stash-poster-proxy:
+    build: .
+    image: emby-stash-poster-proxy:local
+    restart: unless-stopped
+    network_mode: "container:${EMBY_CONTAINER:-emby}"
+    # Group as seen inside Docker; permits reading the existing XML without root.
+    group_add: ["${STASH_CONFIG_GID:-998}"]
+    environment:
+      LISTEN_ADDR: "127.0.0.1:18080"
+      STASH_UPSTREAM: "${STASH_UPSTREAM:-http://10.0.0.8:9999}"
+      PROXY_PUBLIC_URL: "http://127.0.0.1:18080"
+      EMBY_STASH_CONFIG_FILE: /run/secrets/emby-stash.xml
+      STASH_REWRITE_ORIGINS: "${STASH_REWRITE_ORIGINS:-http://10.0.0.7:9999}"
+      CACHE_MAX_MB: "64"
+      CACHE_TTL: 5m
+      CROP_WORKERS: "2"
+    volumes:
+      - type: bind
+        source: "${EMBY_STASH_XML:-/home/jee/apps/emby/plugins/configurations/Emby.Plugins.Stash.xml}"
+        target: /run/secrets/emby-stash.xml
+        read_only: true
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    cpus: 2
