@@ -1,11 +1,12 @@
 # Emby Stash：自动海报裁剪代理支持
 
 基于 [DirtyRacer1337/Jellyfin.Plugin.Stash](https://github.com/DirtyRacer1337/Jellyfin.Plugin.Stash)
-的本地工程，上游起点 `b1ab78b`，本地插件版本 `1.2.0.4`。
+的本地工程，上游起点 `b1ab78b`，本地插件版本 `1.2.0.5`。
 保留插件 ID、配置结构和元数据逻辑，新增可关闭的主海报用途标记，配套 Go 代理完成人脸检测与自动裁剪。
 
 ## 已实现
 
+- Emby 插件列表图标：内嵌 640 × 360 PNG，通过 `IHasThumbImage` 提供。
 - `EnableAutoPosterCrop`：默认关闭；Emby 自动生成的配置界面和 Jellyfin HTML 配置页均有开关。
 - 开启后，Scene 主海报及识别结果海报预览增加 `emby_poster=1`。
 - 背景图、演员图、厂商 Logo 保持原地址；不固定左裁或右裁。
@@ -14,7 +15,7 @@
 - Go 认证反向代理：复用固定版本 MetaTube/Pigo 多角度人脸检测，主海报自动裁成 2:3，无脸或处理失败时返回原图。
 - 代理包含 API Key 注入、GraphQL 图片地址重写、独立海报缓存和当前 Emby 网络配置。
 
-插件和配套代理均已实现，尚未替换本机的正式代理与 Emby 插件。
+插件和配套代理均已实现；安装 DLL 后需要重启 Emby 才会加载新版本和图标。
 先按 [代理部署说明](proxy/README.md) 启用新代理，再开启插件开关；请求约定见 [代理协议](docs/proxy-contract.md)。
 当前开关作用于本插件提供的所有 Scene 主海报，尚不支持按媒体库独立开关。
 

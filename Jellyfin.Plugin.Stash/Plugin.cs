@@ -5,9 +5,12 @@ using Newtonsoft.Json;
 using Stash.Configuration;
 
 #if __EMBY__
+using System.IO;
 using MediaBrowser.Common;
 using MediaBrowser.Common.Net;
+using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Plugins;
+using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Logging;
 #else
 using System.Net.Http;
@@ -22,7 +25,7 @@ using Microsoft.Extensions.Logging;
 namespace Stash
 {
 #if __EMBY__
-    public class Plugin : BasePluginSimpleUI<PluginConfiguration>
+    public class Plugin : BasePluginSimpleUI<PluginConfiguration>, IHasThumbImage
     {
         public Plugin(IApplicationHost applicationHost, IHttpClient http, ILogManager logger)
             : base(applicationHost)
@@ -64,6 +67,12 @@ namespace Stash
 
 #if __EMBY__
         public PluginConfiguration Configuration => this.GetOptions();
+
+        public ImageFormat ThumbImageFormat => ImageFormat.Png;
+
+        public Stream GetThumbImage()
+            => typeof(Plugin).Assembly.GetManifestResourceStream("Stash.Assets.plugin-thumb.png")
+                ?? throw new InvalidOperationException("Embedded Stash plugin thumbnail is missing.");
 #else
 #endif
 

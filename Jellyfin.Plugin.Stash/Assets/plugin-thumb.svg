@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <title>Stash for Emby</title>
+  <desc>Mint green poster frames and an S monogram beside the Stash wordmark on a dark background.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#152b30"/>
+      <stop offset="1" stop-color="#0b141e"/>
+    </linearGradient>
+    <linearGradient id="poster" x2="1" y2="1">
+      <stop stop-color="#47e4b0"/>
+      <stop offset="1" stop-color="#17b98b"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#background)" d="M0 0h640v360H0z"/>
+  <rect x="71" y="110" width="112" height="160" rx="18" fill="#1b4947" transform="rotate(-12 127 190)"/>
+  <rect x="104" y="91" width="112" height="168" rx="18" fill="#226458" transform="rotate(8 160 175)"/>
+  <rect x="104" y="99" width="112" height="168" rx="18" fill="url(#poster)"/>
+  <path d="M181 151h-32a14 14 0 0 0 0 28h22a14 14 0 0 1 0 28h-32"
+        fill="none" stroke="#0c302d" stroke-width="13" stroke-linecap="round"/>
+  <g fill="none" stroke="#a0f7d5" stroke-width="5" stroke-linecap="round">
+    <path d="M91 115V86h29M200 86h29v29M229 251v29h-29M120 280H91v-29"/>
+  </g>
+  <text x="274" y="191" fill="#f2f8f7" font-family="Lato, sans-serif" font-size="57" font-weight="900" letter-spacing="2">STASH</text>
+  <rect x="277" y="214" width="29" height="3" rx="1.5" fill="#47e4b0"/>
+  <text x="319" y="222" fill="#88b7ae" font-family="Lato, sans-serif" font-size="18" font-weight="700" letter-spacing="4">FOR EMBY</text>
+</svg>
