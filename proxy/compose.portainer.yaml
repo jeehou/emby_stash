@@ -1,0 +1,49 @@
+# Complete replacement Compose for Portainer's existing "emby" stack (ID 13).
+# Build emby-stash-poster-proxy:local on the stack's Docker host first.
+# Keep Portainer's "Re-pull image" option disabled for this local image.
+services:
+  emby:
+    image: lscr.io/linuxserver/emby:latest
+    container_name: emby
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Singapore
+    volumes:
+      - /home/jee/apps/emby:/config
+      - /Volume1/public/zos_ssd/xx:/xx
+      - /Volume1/public/z4s/xx:/harddisk_xx
+      - /Volume1/West:/West
+      - /Volume1/public/z4s/tv:/tv
+      - /Volume1/public/z4s/电影:/movie
+      - /Volume1/public/xx/xx/west:/westssd
+      - /Volume1/public/candidate_x:/candidate_x
+    ports:
+      - 8096:8096
+    restart: always
+
+  stash-auth-proxy:
+    image: emby-stash-poster-proxy:local
+    pull_policy: never
+    container_name: stash-auth-proxy
+    network_mode: service:emby
+    depends_on:
+      - emby
+    group_add: ["998"]
+    environment:
+      LISTEN_ADDR: "127.0.0.1:18080"
+      STASH_UPSTREAM: "http://10.0.0.8:9999"
+      PROXY_PUBLIC_URL: "http://127.0.0.1:18080"
+      EMBY_STASH_CONFIG_FILE: /run/secrets/emby-stash.xml
+      STASH_REWRITE_ORIGINS: "http://10.0.0.7:9999"
+      CACHE_MAX_MB: "64"
+      CACHE_TTL: 5m
+      CROP_WORKERS: "2"
+    volumes:
+      - /home/jee/apps/emby/plugins/configurations/Emby.Plugins.Stash.xml:/run/secrets/emby-stash.xml:ro
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    cpus: 2
+    restart: always

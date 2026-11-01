@@ -64,6 +64,23 @@ go build -trimpath -o ../artifacts/proxy/stash-poster-proxy .
 
 ## 当前 Emby 的配套部署
 
+### 在现有 Portainer stack 中更新
+
+`compose.portainer.yaml` 是根据 Portainer 中 `emby` stack（ID 13）的实际 Compose
+整理的完整替换文件。保留 Emby 服务原配置与 `stash-auth-proxy` 服务名，仅将代理切换为
+Go 镜像。继续使用 `network_mode: service:emby` 和 `127.0.0.1:18080`，无需改插件的连接地址。
+
+先在该 stack 对应的 Docker 主机运行 `./scripts/build-proxy.sh`，确认
+`emby-stash-poster-proxy:local` 镜像存在，再把完整文件复制到现有 stack 的 Editor 中更新。
+不要新建第二个 stack；不要开启 **Re-pull image**，本地镜像使用 `pull_policy: never`。
+新代理使用镜像自身入口，删除了旧 Nginx 的 `entrypoint`、启动脚本和配置模板挂载。
+它仍通过只读 XML 获取密钥，并添加当前配置文件的容器内所属组 `998`。
+
+更新后检查代理健康状态和单张图片，再开启插件裁剪选项。旧 Nginx 配置文件保持在原位置，
+回退时在同一个 stack 恢复旧 Compose。下面的独立 Compose 部署是另一种方式，不能同时启动。
+
+### 单独管理代理容器
+
 `compose.emby.yaml` 为当前部署准备：共享 `emby` 网络命名空间，仅监听
 `127.0.0.1:18080`，只读挂载原有 Stash 插件 XML 获取 API Key，上游为 `10.0.0.8:9999`。
 这样现有插件中的代理地址可以继续使用，不需要公开额外 LAN 端口。
