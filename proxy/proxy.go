@@ -217,6 +217,9 @@ func (p *Proxy) writeImage(w http.ResponseWriter, r *http.Request, v ImageResult
 	w.Header().Set("X-Emby-Poster", v.Mode)
 	if v.Mode == "auto" {
 		w.Header().Set("X-Emby-Poster-Position", strconv.FormatFloat(v.Position, 'f', 4, 64))
+		if v.Strategy != "" {
+			w.Header().Set("X-Emby-Poster-Strategy", v.Strategy)
+		}
 	}
 	if r.Header.Get("If-None-Match") == tag {
 		w.WriteHeader(http.StatusNotModified)

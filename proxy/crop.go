@@ -16,13 +16,14 @@ import (
 )
 
 const posterRatio = 2.0 / 3.0
-const algorithmVersion = "metatube-fdadc9c-auto-v1-q90"
+const algorithmVersion = "metatube-fdadc9c-cover-v2-q90"
 const maxImageBytes = 16 << 20
 const maxImagePixels = 24_000_000
 
 type ImageResult struct {
 	Body              []byte
 	ContentType, Mode string
+	Strategy          string
 	Position          float64
 	NoStore           bool
 }
@@ -52,10 +53,14 @@ func cropPoster(data []byte) (out ImageResult, err error) {
 	if math.IsNaN(pos) || math.IsInf(pos, 0) || pos < 0 || pos > 1 {
 		return out, fmt.Errorf("invalid detected position")
 	}
+	strategy := "face"
+	if coverPos, ok := coverPosition(img, pos); ok {
+		pos, strategy = coverPos, "cover-panel"
+	}
 	cropped := imageutil.CropImagePosition(img, posterRatio, pos)
 	var buf bytes.Buffer
 	if err = jpeg.Encode(&buf, cropped, &jpeg.Options{Quality: 90}); err != nil {
 		return out, errors.New("image encode failed")
 	}
-	return ImageResult{Body: buf.Bytes(), ContentType: "image/jpeg", Mode: "auto", Position: pos}, nil
+	return ImageResult{Body: buf.Bytes(), ContentType: "image/jpeg", Mode: "auto", Position: pos, Strategy: strategy}, nil
 }
