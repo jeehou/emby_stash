@@ -10,13 +10,14 @@ import (
 	_ "image/png"
 	"math"
 
+	"github.com/disintegration/imaging"
 	"github.com/metatube-community/metatube-sdk-go/detector"
 	"github.com/metatube-community/metatube-sdk-go/imageutil"
 	_ "golang.org/x/image/webp"
 )
 
 const posterRatio = 2.0 / 3.0
-const algorithmVersion = "metatube-fdadc9c-cover-v2-q90"
+const algorithmVersion = "metatube-fdadc9c-cover-v3-q90"
 const maxImageBytes = 16 << 20
 const maxImagePixels = 24_000_000
 
@@ -46,7 +47,14 @@ func cropPoster(data []byte) (out ImageResult, err error) {
 	if err != nil {
 		return out, errors.New("image decode failed")
 	}
-	pos, found := detector.FindPrimaryFaceAxisRatio(img, posterRatio, true)
+	// Choose the front before looking for faces: a back-cover collage can have
+	// more (and higher-scoring) detections than the actual front photograph.
+	panel, hasBarcode := barcodeFrontPanel(img)
+	detectionImage := img
+	if hasBarcode {
+		detectionImage = imaging.Crop(img, panel)
+	}
+	pos, found := detector.FindPrimaryFaceAxisRatio(detectionImage, posterRatio, true)
 	if !found {
 		return ImageResult{Body: data, Mode: "original-no-face"}, nil
 	}
@@ -54,7 +62,13 @@ func cropPoster(data []byte) (out ImageResult, err error) {
 		return out, fmt.Errorf("invalid detected position")
 	}
 	strategy := "face"
-	if coverPos, ok := coverPosition(img, pos); ok {
+	if hasBarcode {
+		b := img.Bounds()
+		faceX := float64(panel.Min.X-b.Min.X) + pos*float64(panel.Dx())
+		half := float64(int(float64(b.Dy())*posterRatio)) / 2
+		center := math.Max(float64(panel.Min.X-b.Min.X)+half, math.Min(faceX, float64(panel.Max.X-b.Min.X)-half))
+		pos, strategy = center/float64(b.Dx()), "cover-barcode"
+	} else if coverPos, ok := coverPosition(img, pos); ok {
 		pos, strategy = coverPos, "cover-panel"
 	}
 	cropped := imageutil.CropImagePosition(img, posterRatio, pos)
