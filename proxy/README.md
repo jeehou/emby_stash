@@ -70,9 +70,11 @@ go build -trimpath -o ../artifacts/proxy/stash-poster-proxy .
 整理的完整替换文件。保留 Emby 服务原配置与 `stash-auth-proxy` 服务名，仅将代理切换为
 Go 镜像。继续使用 `network_mode: service:emby` 和 `127.0.0.1:18080`，无需改插件的连接地址。
 
-先在该 stack 对应的 Docker 主机运行 `./scripts/build-proxy.sh`，确认
-`emby-stash-poster-proxy:local` 镜像存在，再把完整文件复制到现有 stack 的 Editor 中更新。
-不要新建第二个 stack；不要开启 **Re-pull image**，本地镜像使用 `pull_policy: never`。
+使用 `ghcr.io/jeehou/emby-stash-poster-proxy:latest`，不再要求本机手动构建。
+首次部署前，确认 [镜像发布流程](../docs/registry-publishing.md) 已完成且镜像能匿名拉取，
+再把完整文件复制到现有 stack 的 Editor 中更新。不要新建第二个 stack。
+之后可开启 **Re-pull image** 获取 `latest`；也可固定到 `v*` 或 `sha-*` 版本以便回退。
+当前发布目标是 `linux/amd64`，适用于这台 Emby 主机。
 新代理使用镜像自身入口，删除了旧 Nginx 的 `entrypoint`、启动脚本和配置模板挂载。
 它仍通过只读 XML 获取密钥，并添加当前配置文件的容器内所属组 `998`。
 

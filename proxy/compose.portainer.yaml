@@ -1,6 +1,6 @@
 # Complete replacement Compose for Portainer's existing "emby" stack (ID 13).
-# Build emby-stash-poster-proxy:local on the stack's Docker host first.
-# Keep Portainer's "Re-pull image" option disabled for this local image.
+# Requires a successful GHCR publish and package pull access first.
+# Portainer's "Re-pull image" option can be enabled.
 services:
   emby:
     image: lscr.io/linuxserver/emby:latest
@@ -23,8 +23,7 @@ services:
     restart: always
 
   stash-auth-proxy:
-    image: emby-stash-poster-proxy:local
-    pull_policy: never
+    image: ghcr.io/jeehou/emby-stash-poster-proxy:latest
     container_name: stash-auth-proxy
     network_mode: service:emby
     depends_on:

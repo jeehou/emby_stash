@@ -44,8 +44,11 @@ artifacts/proxy/stash-poster-proxy
 
 代理构建另外生成镜像 `emby-stash-poster-proxy:local`，运行时无需下载人脸模型。
 
-GitHub Actions 构建模板保存在 `docs/github-actions-build.yml`，目前未启用。
-使用具有工作流写入权限的凭据，将其放入 `.github/workflows/build.yml` 后即可启用。
+GitHub Actions 流程见 `.github/workflows/build.yml`：构建插件和代理，检查通过后发布
+`ghcr.io/jeehou/emby-stash-poster-proxy`。`main` 更新 `latest`，`v*` 标签发布同名版本，
+每次发布还保留 `sha-<12 位提交号>` 以便回退；PR 仅构建，不发布。
+首次启用需要具有 `workflow` 权限的 GitHub 凭据，首次发布后需将 GHCR 包设为 Public，
+才能让 Portainer 无需认证拉取。部署前应确认 Actions 成功且镜像可拉取，见 [发布说明](docs/registry-publishing.md)。
 
 有本地 .NET 10 SDK 时也可以直接运行：
 

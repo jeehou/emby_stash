@@ -1,0 +1,68 @@
+name: Build and publish
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  emby:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test and build Emby plugin
+        run: ./scripts/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emby-stash-plugin
+          if-no-files-found: error
+          path: |
+            artifacts/Emby.Plugins.Stash-auto-poster.tar.gz
+            artifacts/SHA256SUMS
+
+  proxy:
+    needs: emby
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test and build proxy image and binary
+        run: ./scripts/build-proxy.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stash-poster-proxy-linux-amd64
+          if-no-files-found: error
+          path: artifacts/proxy/
+      - name: Publish proxy to GHCR
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/emby-stash-poster-proxy"
+          revision="sha-${GITHUB_SHA:0:12}"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+          trap 'docker logout ghcr.io >/dev/null 2>&1' EXIT
+          docker tag emby-stash-poster-proxy:local "$image:$revision"
+          docker push "$image:$revision"
+          if [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            tag=latest
+          else
+            tag="$GITHUB_REF_NAME"
+          fi
+          docker tag emby-stash-poster-proxy:local "$image:$tag"
+          docker push "$image:$tag"
+          printf 'Published `%s:%s` and `%s:%s` (linux/amd64).\n' "$image" "$tag" "$image" "$revision" >> "$GITHUB_STEP_SUMMARY"

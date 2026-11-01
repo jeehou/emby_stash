@@ -16,6 +16,10 @@ RUN mkdir -p /out/licenses && \
     cp /go/pkg/mod/golang.org/x/image@*/LICENSE /out/licenses/x-image.txt
 
 FROM alpine:3.22
+LABEL org.opencontainers.image.source="https://github.com/jeehou/emby_stash" \
+      org.opencontainers.image.title="Emby Stash Poster Proxy" \
+      org.opencontainers.image.description="Stash authentication proxy with face-aware poster cropping" \
+      org.opencontainers.image.licenses="MIT AND Apache-2.0 AND BSD-3-Clause"
 RUN apk add --no-cache ca-certificates
 COPY --from=build /out/stash-poster-proxy /usr/local/bin/stash-poster-proxy
 COPY --from=build /out/licenses /usr/share/licenses/stash-poster-proxy
