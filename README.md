@@ -43,6 +43,9 @@ artifacts/proxy/stash-poster-proxy
 
 代理构建另外生成镜像 `emby-stash-poster-proxy:local`，运行时无需下载人脸模型。
 
+GitHub Actions 构建模板保存在 `docs/github-actions-build.yml`，目前未启用。
+使用具有工作流写入权限的凭据，将其放入 `.github/workflows/build.yml` 后即可启用。
+
 有本地 .NET 10 SDK 时也可以直接运行：
 
 ```bash
