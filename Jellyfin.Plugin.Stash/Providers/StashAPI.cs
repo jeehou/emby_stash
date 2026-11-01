@@ -215,23 +215,8 @@ namespace Stash.Providers
                 Url = sceneData.Paths.Screenshot,
             });
 
-            if (sceneData.Studio.HasValue)
-            {
-                result.Add(new RemoteImageInfo
-                {
-                    Type = ImageType.Logo,
-                    Url = sceneData.Studio.Value.ImagePath,
-                });
-
-                if (sceneData.Studio.Value.ParentStudio.HasValue)
-                {
-                    result.Add(new RemoteImageInfo
-                    {
-                        Type = ImageType.Logo,
-                        Url = sceneData.Studio.Value.ParentStudio.Value.ImagePath,
-                    });
-                }
-            }
+            // Studio artwork is not a scene title logo. Emby may display a Logo
+            // instead of the movie name, including Stash's placeholder image.
 
             return result;
         }

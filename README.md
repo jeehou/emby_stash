@@ -1,12 +1,13 @@
 # Emby Stash：自动海报裁剪代理支持
 
 基于 [DirtyRacer1337/Jellyfin.Plugin.Stash](https://github.com/DirtyRacer1337/Jellyfin.Plugin.Stash)
-的本地工程，上游起点 `b1ab78b`，本地插件版本 `1.2.0.5`。
+的本地工程，上游起点 `b1ab78b`，本地插件版本 `1.2.0.6`。
 保留插件 ID、配置结构和元数据逻辑，新增可关闭的主海报用途标记，配套 Go 代理完成人脸检测与自动裁剪。
 
 ## 已实现
 
 - Emby 插件列表图标：内嵌 640 × 360 PNG，通过 `IHasThumbImage` 提供。
+- Scene 图片只提供主海报与背景图；厂商图片不再写成影片 Logo，避免占位图遮住标题。
 - `EnableAutoPosterCrop`：默认关闭；Emby 自动生成的配置界面和 Jellyfin HTML 配置页均有开关。
 - 开启后，Scene 主海报及识别结果海报预览增加 `emby_poster=1`。
 - 背景图、演员图、厂商 Logo 保持原地址；不固定左裁或右裁。
@@ -69,6 +70,9 @@ dotnet build Jellyfin.Plugin.Stash/Stash.csproj -c Release.Emby
 5. 回退时先关闭开关；如需回退二进制，停止 Emby 并恢复原 DLL。已经缓存的裁剪海报需重新获取才会恢复原图。
 
 当前不自动部署、不批量刷新媒体库、不移动视频、不改写 Stash 原图。
+
+从旧版升级后，如果影片标题位置仍显示厂商图标或摄像机占位图，请在该条目的“编辑图片”
+中删除错误的 Logo。已有 Logo 不会因升级插件自动删除；无需修改标题或简介。
 
 ## 工程入口
 
